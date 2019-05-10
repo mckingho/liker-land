@@ -46,18 +46,25 @@ const apiRefreshAccessToken = async req => {
   }
 };
 
-async function sendAuthorizedRequest(req, callback) {
+async function sendAuthorizedRequest(req, callback, res) {
+  if (res) res.startTime('auth_req', 'Start authed request');
   let Authorization = `Bearer ${req.session.accessToken}`;
   try {
-    const res = await callback(Authorization);
-    return res;
+    const r = await callback(Authorization);
+    if (res) res.endTime('auth_req');
+    return r;
   } catch (err) {
     if (!err.response || err.response.status !== 401) {
+      if (res) res.endTime('auth_req');
       throw err;
     }
+    if (res) res.startTime('auth_refresh', 'Refresh auth token');
     if (await apiRefreshAccessToken(req)) {
       Authorization = `Bearer ${req.session.accessToken}`;
-      return callback(Authorization);
+      if (res) res.endTime('auth_refresh');
+      const r = await callback(Authorization);
+      if (res) res.endTime('auth_req');
+      return r;
     }
     throw err;
   }
@@ -67,11 +74,14 @@ const apiRefreshToken = refreshToken =>
   axios.post(
     `${LIKECOIN_API_BASE}/oauth/access_token?client_id=${LIKE_CO_CLIENT_ID}&client_secret=${LIKE_CO_CLIENT_SECRET}&grant_type=refresh_token&refresh_token=${refreshToken}`
   );
-const apiFetchUserProfile = req =>
-  sendAuthorizedRequest(req, Authorization =>
-    axios.get(`${LIKECOIN_API_BASE}/users/profile`, {
-      headers: { Authorization },
-    })
+const apiFetchUserProfile = (req, res) =>
+  sendAuthorizedRequest(
+    req,
+    Authorization =>
+      axios.get(`${LIKECOIN_API_BASE}/users/profile`, {
+        headers: { Authorization },
+      }),
+    res
   );
 const apiFetchUserPublicProfile = user =>
   axios.get(`${LIKECOIN_API_BASE}/users/id/${user}/min`);

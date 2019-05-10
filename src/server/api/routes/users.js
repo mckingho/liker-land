@@ -29,9 +29,13 @@ const router = Router();
 
 router.get('/users/self', async (req, res, next) => {
   try {
+    res.startTime('user_self', 'User self begin');
     const { user } = req.session;
     if (user) {
-      const { data } = await apiFetchUserProfile(req);
+      res.startTime('user_self_fetch', 'User self fetch profile');
+      const { data } = await apiFetchUserProfile(req, res);
+      res.endTime('user_self_fetch');
+      res.endTime('user_self');
       res.json({ user, ...data, intercomToken: getIntercomUserHash(user) });
       return;
     }

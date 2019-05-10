@@ -2,6 +2,7 @@ const express = require('express');
 const cookieParser = require('cookie-parser');
 const consola = require('consola');
 const { Nuxt, Builder } = require('nuxt');
+const serverTiming = require('server-timing');
 const api = require('./api');
 
 const app = express();
@@ -28,6 +29,7 @@ async function start() {
     await nuxt.ready();
   }
 
+  app.use(serverTiming());
   app.use('/api', api);
   app.use(cookieParser());
   // Give nuxt middleware to express
