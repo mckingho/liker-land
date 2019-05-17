@@ -36,7 +36,7 @@ router.post('/civic/payment/stripe', async (req, res, next) => {
       res.sendStatus(403);
       return;
     }
-    const { token } = req.body;
+    const { from, referrer, token } = req.body;
     const userRef = userCollection.doc(req.session.user);
     const userDoc = await userRef.get();
     const {
@@ -78,9 +78,16 @@ router.post('/civic/payment/stripe', async (req, res, next) => {
       }
     }
     if (!subscription) {
+      const metadata = {
+        userId: req.session.user,
+        displayName,
+      };
+      if (from) metadata.from = from;
+      if (referrer) metadata.referrer = referrer.substring(0, 500);
       subscription = await stripe.subscriptions.create({
         customer: customer.id,
         items: [{ plan: STRIPE_PLAN_ID }],
+        metadata,
       });
     }
     await userRef.update({

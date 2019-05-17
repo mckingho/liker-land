@@ -25,6 +25,8 @@ export default {
       stripe: null,
       card: null,
       hasPaymentAPI: false,
+      from: undefined,
+      referrer: undefined,
       error: '',
     };
   },
@@ -52,6 +54,10 @@ export default {
     };
   },
   mounted() {
+    if (window.sessionStorage) {
+      this.from = window.sessionStorage.getItem('civicLikerFrom');
+      this.referrer = window.sessionStorage.getItem('civicLikerReferrer');
+    }
     this.initStripe();
   },
   methods: {
@@ -84,6 +90,19 @@ export default {
         if (result) {
           this.hasPaymentAPI = true;
           this.$nextTick(() => prButton.mount(this.$refs.paymentRequestButton)); // wait for refs to show
+          paymentRequest.on('token', async e => {
+            try {
+              await this.$axios.$post(getStripePaymentAPI(), {
+                from: this.from,
+                referer: this.referrer,
+                token: result.token,
+              });
+              e.complete('success');
+            } catch (err) {
+              console.error(result.error); // eslint-disable-line no-console
+              e.complete('fail');
+            }
+          });
         }
       });
       this.card = elements.create('card', {
@@ -97,15 +116,18 @@ export default {
       this.card.mount(this.$refs.card);
     },
     onSubmitPayment(event) {
-      this.stripe.createToken(this.card).then(function(result) {
+      this.stripe.createToken(this.card).then(result => {
         if (result.error) {
-          // Inform the customer that there was an error.
           console.error(result.error); // eslint-disable-line no-console
           this.error = result.error.message;
         } else {
-          // Send the token to your server.
-          this.$axios.$post(getStripePaymentAPI(), { token: result.token });
-          // stripeTokenHandler({ token });
+          // TODO: check status field of return payload
+          this.$axios.$post(getStripePaymentAPI(), {
+            from: this.from,
+            referer: this.referrer,
+            token: result.token,
+          });
+          this.$router.push({ name: 'civic-payment-success' });
         }
       });
     },
