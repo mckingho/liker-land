@@ -67,6 +67,8 @@ const colors = {
   'like-cyan-darker': '#1aa384',
   'like-cyan-translucent': 'rgba(80, 227, 194, 0.15)',
   'like-cyan-translucent-dark': 'rgba(26, 163, 132, 0.15)',
+
+  'error': '#eb5757',
 };
 
 module.exports = {

@@ -1,25 +1,59 @@
-<template>
-  <div>
-    <div v-if="!stripe">Loading... (or maybe stripe is broken)</div>
-    <button v-if="hasPaymentAPI" ref="paymentRequestButton" />
-    <form id="payment-form" @submit.prevent="onSubmitPayment">
-      <div class="form-row">
-        <div ref="card" />
+<template lang="pug">
+  .civic-register-page
+    PageHeader
+      template
+        SiteNavBar.text-like-green
 
-        <!-- Used to display form errors. -->
-        <div v-if="error">{{ error }}</div>
-      </div>
-      <button v-if="card">Pay</button>
-    </form>
-  </div>
+      main.page-content.page-content--narrow
+        .civic-register-page__header
+          LockIcon
+
+        .text-12.text-center.font-600.leading-1_5.mt-16.px-32
+          .text-gray-4a
+            | {{ $t('CivicRegisterPage.chooseYourPaymentMethod') }}
+          .text-gray-9b.mt-8
+            | {{ $t('CivicRegisterPage.extraCharge') }}
+
+        .civic-register-page__payment-method-list
+          div
+            LcLoadingIndicator.text-like-green(v-if="!stripe")
+
+            template(v-if="hasPaymentAPI")
+              button(ref="paymentRequestButton")
+
+              .text-gray-4a.text-center.text-12.font-600.my-16
+                | {{ $t('CivicRegisterPage.or') }}
+
+            header.text-like-green.text-14.text-center.font-600(v-if="stripe")
+              | {{ $t('CivicRegisterPage.creditCard') }}
+
+            form.civic-register-page__payment-method-list-item.civic-register-page__credit-card-form(
+              id="payment-form"
+              @submit.prevent="onSubmitPayment"
+            )
+              .text-error.text-12.mt-8(v-if="error") {{ error }}
+              .mt-8(ref="card")
+              button.btn.btn--outlined.mt-24(v-if="card")
+                | {{ $t('confirm') }}
+
 </template>
 
 <script>
+import PageHeader from '~/components/PageHeader';
+import SiteNavBar from '~/components/SiteNavBar';
+
+import LockIcon from '~/assets/icons/lock-w-circle.svg';
+
 import { getStripePaymentAPI } from '~/util/api';
 
 export default {
+  name: 'CivicRegisterPage',
+  components: {
+    PageHeader,
+    SiteNavBar,
+    LockIcon,
+  },
   middleware: 'authenticated',
-  layout: 'dialog',
   data() {
     return {
       stripe: null,
@@ -37,12 +71,12 @@ export default {
         {
           hid: 'description',
           name: 'description',
-          content: this.$t('CivicPage.slogan'),
+          content: this.$t('CivicPage.title'),
         },
         {
           hid: 'og:description',
           property: 'og:description',
-          content: this.$t('CivicPage.slogan'),
+          content: this.$t('CivicPage.title'),
         },
         {
           hid: 'og:image',
@@ -134,3 +168,49 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+.civic-register-page {
+  &__header {
+    @apply flex;
+    @apply justify-center;
+    @apply items-center;
+
+    @apply text-like-green;
+
+    @apply mt-4;
+
+    > svg {
+      @apply fill-current;
+    }
+  }
+
+  &__payment-method-list {
+    @apply rounded;
+
+    @apply mt-24;
+    @apply p-24;
+    @apply pb-32;
+
+    @apply bg-white;
+
+    > div {
+      @apply flex;
+      @apply flex-col;
+      @apply items-center;
+    }
+
+    &-item {
+      max-width: 320px;
+
+      @apply w-full;
+    }
+  }
+
+  &__credit-card-form {
+    @apply flex;
+    @apply flex-col;
+    @apply mt-16;
+  }
+}
+</style>

@@ -45,6 +45,12 @@
       "Photos by Anthony Tran, Joe Gardner, KE ATLAS, Quentin Keller and Warren Wong"
     ]
   },
+  "CivicRegisterPage": {
+    "chooseYourPaymentMethod": "選擇你的付款方法",
+    "extraCharge": "此筆交易為跨國付款，您可能會被收取額外的手續費",
+    "or": "或",
+    "creditCard": "信用卡"
+  },
   "ContentList": {
     "empty": "沒有文章"
   },
@@ -151,6 +157,7 @@
   "back": "上一頁",
   "backToHome": "返回首頁",
   "civicLiker": "讚賞公民",
+  "confirm": "確認",
   "follow": "追踪",
   "following": "追踪中",
   "join": "登記",

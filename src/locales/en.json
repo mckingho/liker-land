@@ -45,6 +45,12 @@
       "Photos by Anthony Tran, Joe Gardner, KE ATLAS, Quentin Keller and Warren Wong"
     ]
   },
+  "CivicRegisterPage": {
+    "chooseYourPaymentMethod": "Choose your payment method",
+    "extraCharge": "This transaction is a foreign payment and you may be charged an additional fee.",
+    "or": "or",
+    "creditCard": "Credit Card"
+  },
   "ContentList": {
     "empty": "There is no article"
   },
@@ -156,6 +162,7 @@
   "back": "Back",
   "backToHome": "Home",
   "civicLiker": "Civic Liker",
+  "confirm": "Confirm",
   "follow": "Follow",
   "following": "Following",
   "join": "Join",
